@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --bg-app: #f7f8f6;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f0f2ef;
+  --border: #d9deda;
+  --text-primary: #17201d;
+  --text-secondary: #5f6965;
+  --text-muted: #8a928e;
+
+  --brand: #0b5f63;
+  --brand-dark: #08484b;
+  --accent-copper: #b56a32;
+
+  --success: #19734a;
+  --warning: #a96800;
+  --danger: #b43a35;
+  --info: #315f9e;
+
+  --prospect-low: #dce9ed;
+  --prospect-medium: #4e9ca0;
+  --prospect-high: #163e63;
+
+  --risk-watch: #a96800;
+  --risk-at-risk: #c9760b;
+
+  --focus-ring: #0b5f63;
+}
+
+:root[data-theme="dark"] {
+  --bg-app: #0f1413;
+  --bg-surface: #151b19;
+  --bg-subtle: #1c2421;
+  --border: #2a3430;
+  --text-primary: #edf2ef;
+  --text-secondary: #a9b3ae;
+  --text-muted: #6f7a75;
+
+  --brand: #5eb4b3;
+  --brand-dark: #3f8f8e;
+  --accent-copper: #d18a4a;
+
+  --success: #34a06a;
+  --warning: #c98a1f;
+  --danger: #d1615c;
+  --info: #5b8fd1;
+
+  --prospect-low: #22343d;
+  --prospect-medium: #3f8286;
+  --prospect-high: #7fb8d9;
+
+  --risk-watch: #c98a1f;
+  --risk-at-risk: #d98f3a;
+
+  --focus-ring: #5eb4b3;
+}
+
+@theme inline {
+  --color-bg-app: var(--bg-app);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-accent-copper: var(--accent-copper);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --color-prospect-low: var(--prospect-low);
+  --color-prospect-medium: var(--prospect-medium);
+  --color-prospect-high: var(--prospect-high);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-plex-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+::selection {
+  background: var(--prospect-medium);
+  color: #ffffff;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.leaflet-container {
+  background: var(--bg-subtle) !important;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: var(--bg-surface) !important;
+  color: var(--text-muted) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--text-secondary) !important;
+}
