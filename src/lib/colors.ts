@@ -33,3 +33,27 @@ export function prospectivityColor(value: number, theme: ThemeName = "light"): s
   const rgb = v <= 0.5 ? lerp(low, medium, v / 0.5) : lerp(medium, high, (v - 0.5) / 0.5);
   return rgbToHex(rgb);
 }
+
+// Categorical scale for "colour by confidence" mode — how strongly a
+// target resembles ground with known deposits, independent of its raw
+// prospectivity score.
+const CONFIDENCE_COLORS: Record<ThemeName, Record<"high" | "medium" | "low", string>> = {
+  light: { high: "#19734A", medium: "#315F9E", low: "#8A928E" },
+  dark: { high: "#34A06A", medium: "#5B8FD1", low: "#6F7A75" },
+};
+
+export function confidenceColor(confidence: "high" | "medium" | "low", theme: ThemeName = "light"): string {
+  return CONFIDENCE_COLORS[theme][confidence];
+}
+
+export const CONFIDENCE_MATCH_LABEL: Record<"high" | "medium" | "low", string> = {
+  high: "Strong match",
+  medium: "Partial match",
+  low: "Limited match",
+};
+
+export const CONFIDENCE_MATCH_DETAIL: Record<"high" | "medium" | "low", string> = {
+  high: "Resembles ground with known deposits.",
+  medium: "Partly resembles known-deposit ground.",
+  low: "Little local training data supports this ground.",
+};

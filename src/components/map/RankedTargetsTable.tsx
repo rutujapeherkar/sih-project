@@ -9,9 +9,17 @@ interface RankedTargetsTableProps {
   targets: Target[];
   selectedTargetId: string | null;
   onSelectTarget: (id: string) => void;
+  hoveredTargetId: string | null;
+  onHoverTarget: (id: string | null) => void;
 }
 
-export function RankedTargetsTable({ targets, selectedTargetId, onSelectTarget }: RankedTargetsTableProps) {
+export function RankedTargetsTable({
+  targets,
+  selectedTargetId,
+  onSelectTarget,
+  hoveredTargetId,
+  onHoverTarget,
+}: RankedTargetsTableProps) {
   const ranked = [...targets].sort((a, b) => b.prospectivity - a.prospectivity);
 
   return (
@@ -23,7 +31,7 @@ export function RankedTargetsTable({ targets, selectedTargetId, onSelectTarget }
           <Th>Prospectivity</Th>
           <Th>Confidence</Th>
           <Th>Area</Th>
-          <Th>Top evidence</Th>
+          <Th>Strongest evidence</Th>
         </Tr>
       </Thead>
       <Tbody>
@@ -33,7 +41,12 @@ export function RankedTargetsTable({ targets, selectedTargetId, onSelectTarget }
             id={`target-row-${target.id}`}
             interactive
             onClick={() => onSelectTarget(target.id)}
-            className={cn(selectedTargetId === target.id && "bg-brand/5 border-l-2 border-l-brand")}
+            onMouseEnter={() => onHoverTarget(target.id)}
+            onMouseLeave={() => onHoverTarget(null)}
+            className={cn(
+              selectedTargetId === target.id && "bg-brand/5 border-l-2 border-l-brand",
+              hoveredTargetId === target.id && selectedTargetId !== target.id && "bg-bg-subtle",
+            )}
           >
             <Td className="text-text-muted font-mono">{i + 1}</Td>
             <Td className="font-mono font-medium">{target.id}</Td>
@@ -52,7 +65,13 @@ export function RankedTargetsTable({ targets, selectedTargetId, onSelectTarget }
               <ConfidenceDot confidence={target.confidence} />
             </Td>
             <Td className="font-mono text-text-secondary">{target.areaKm2.toFixed(2)} km²</Td>
-            <Td className="text-text-secondary">{target.evidence[0]?.label ?? "—"}</Td>
+            <Td className="text-text-secondary">
+              {target.evidence
+                .filter((e) => e.direction === "positive")
+                .slice(0, 3)
+                .map((e) => e.label)
+                .join(" · ") || "—"}
+            </Td>
           </Tr>
         ))}
       </Tbody>

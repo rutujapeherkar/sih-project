@@ -13,7 +13,7 @@ import "leaflet/dist/leaflet.css";
 import { Mine } from "@/types";
 import { Target, Drillhole, GeologyUnit } from "@/types";
 import { LayerState } from "@/store/useUIStore";
-import { prospectivityColor } from "@/lib/colors";
+import { prospectivityColor, confidenceColor, CONFIDENCE_MATCH_LABEL } from "@/lib/colors";
 import { centroid } from "@/components/map/mapUtils";
 
 const LIGHT_TILES = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
@@ -21,15 +21,20 @@ const DARK_TILES = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.pn
 const SATELLITE_TILES =
   "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
 
+const CONFIDENCE_GLYPH: Record<"high" | "medium" | "low", string> = { high: "●", medium: "◐", low: "○" };
+
 interface ExploreMapProps {
   mine: Mine;
   targets: Target[];
   drillholes: Drillhole[];
   geologyUnits: GeologyUnit[];
   layers: LayerState;
+  colorBy: "prospectivity" | "confidence";
   theme: "light" | "dark";
   selectedTargetId: string | null;
   onSelectTarget: (id: string) => void;
+  hoveredTargetId: string | null;
+  onHoverTarget: (id: string | null) => void;
   resetSignal: number;
 }
 
@@ -99,9 +104,12 @@ export default function ExploreMap({
   drillholes,
   geologyUnits,
   layers,
+  colorBy,
   theme,
   selectedTargetId,
   onSelectTarget,
+  hoveredTargetId,
+  onHoverTarget,
   resetSignal,
 }: ExploreMapProps) {
   const tileUrl = layers.satellite ? SATELLITE_TILES : theme === "dark" ? DARK_TILES : LIGHT_TILES;
@@ -156,24 +164,46 @@ export default function ExploreMap({
         {layers.prospectivity &&
           targets.map((target) => {
             const isSelected = target.id === selectedTargetId;
-            const fill = prospectivityColor(target.prospectivity, theme);
+            const isHovered = target.id === hoveredTargetId;
+            const fill =
+              colorBy === "confidence"
+                ? confidenceColor(target.confidence, theme)
+                : prospectivityColor(target.prospectivity, theme);
             return (
               <Polygon
                 key={target.id}
                 positions={target.polygon}
-                eventHandlers={{ click: () => onSelectTarget(target.id) }}
+                eventHandlers={{
+                  click: () => onSelectTarget(target.id),
+                  mouseover: () => onHoverTarget(target.id),
+                  mouseout: () => onHoverTarget(null),
+                }}
                 pathOptions={{
                   color: isSelected ? "#0B5F63" : fill,
-                  weight: isSelected ? 3 : 1.5,
+                  weight: isSelected ? 3 : isHovered ? 2.5 : 1.5,
                   fillColor: fill,
-                  fillOpacity: isSelected ? 0.75 : 0.55,
+                  fillOpacity: isSelected || isHovered ? 0.75 : 0.55,
                   dashArray: layers.confidence ? dashForConfidence[target.confidence] : undefined,
                 }}
               >
-                <Tooltip sticky direction="top" opacity={0.95}>
-                  <div className="text-xs">
-                    <div className="font-semibold">{target.label}</div>
-                    <div>Prospectivity {target.prospectivity.toFixed(2)}</div>
+                <Tooltip sticky direction="top" opacity={1}>
+                  <div className="w-44">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-mono font-semibold text-[12px]">{target.id}</span>
+                      <span className="font-mono text-[12px] tabular-nums">{target.prospectivity.toFixed(2)}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-bg-subtle overflow-hidden mb-1.5">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${target.prospectivity * 100}%`,
+                          background: prospectivityColor(target.prospectivity, theme),
+                        }}
+                      />
+                    </div>
+                    <div className="text-[11px] text-text-secondary">
+                      {CONFIDENCE_GLYPH[target.confidence]} {CONFIDENCE_MATCH_LABEL[target.confidence]}
+                    </div>
                   </div>
                 </Tooltip>
               </Polygon>

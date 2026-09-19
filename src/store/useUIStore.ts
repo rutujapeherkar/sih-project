@@ -30,8 +30,14 @@ interface UIState {
   layers: LayerState;
   toggleLayer: (key: keyof LayerState) => void;
 
+  colorBy: "prospectivity" | "confidence";
+  setColorBy: (mode: "prospectivity" | "confidence") => void;
+
   selectedTargetId: string | null;
   setSelectedTargetId: (id: string | null) => void;
+
+  hoveredTargetId: string | null;
+  setHoveredTargetId: (id: string | null) => void;
 
   actionStatuses: Record<string, ActionDecision>;
   actionLog: ActionLogEntry[];
@@ -77,8 +83,14 @@ export const useUIStore = create<UIState>((set, get) => ({
   toggleLayer: (key) =>
     set((s) => ({ layers: { ...s.layers, [key]: !s.layers[key] } })),
 
+  colorBy: "prospectivity",
+  setColorBy: (mode) => set({ colorBy: mode }),
+
   selectedTargetId: null,
   setSelectedTargetId: (id) => set({ selectedTargetId: id }),
+
+  hoveredTargetId: null,
+  setHoveredTargetId: (id) => set({ hoveredTargetId: id }),
 
   actionStatuses: {},
   actionLog: initialActionLog,

@@ -8,9 +8,9 @@ import { getTargetsByMine } from "@/data/targets";
 import { getDrillholesByMine, drillholes as allDrillholes } from "@/data/drillholes";
 import { getGeologyByMine } from "@/data/geology";
 import { LayerControls } from "@/components/map/LayerControls";
-import { MapLegend } from "@/components/map/MapLegend";
 import { TargetPanel } from "@/components/map/TargetPanel";
 import { RankedTargetsTable } from "@/components/map/RankedTargetsTable";
+import { MapStatusBar } from "@/components/map/MapStatusBar";
 import { Button } from "@/components/ui/Button";
 import { SearchIcon, ResetIcon } from "@/components/icons";
 
@@ -27,8 +27,11 @@ export default function ExplorePage() {
   const mineId = useUIStore((s) => s.selectedMineId);
   const theme = useUIStore((s) => s.theme);
   const layers = useUIStore((s) => s.layers);
+  const colorBy = useUIStore((s) => s.colorBy);
   const selectedTargetId = useUIStore((s) => s.selectedTargetId);
   const setSelectedTargetId = useUIStore((s) => s.setSelectedTargetId);
+  const hoveredTargetId = useUIStore((s) => s.hoveredTargetId);
+  const setHoveredTargetId = useUIStore((s) => s.setHoveredTargetId);
 
   const [search, setSearch] = useState("");
   const [resetSignal, setResetSignal] = useState(0);
@@ -77,7 +80,7 @@ export default function ExplorePage() {
       </div>
 
       <div className="flex-1 min-h-0 flex">
-        <aside className="w-44 shrink-0 border-r border-border bg-bg-surface overflow-y-auto scrollbar-thin">
+        <aside className="w-60 shrink-0 border-r border-border bg-bg-surface overflow-y-auto scrollbar-thin">
           <LayerControls />
         </aside>
 
@@ -88,12 +91,14 @@ export default function ExplorePage() {
             drillholes={mineDrillholes}
             geologyUnits={mineGeology}
             layers={layers}
+            colorBy={colorBy}
             theme={theme}
             selectedTargetId={selectedTargetId}
             onSelectTarget={setSelectedTargetId}
+            hoveredTargetId={hoveredTargetId}
+            onHoverTarget={setHoveredTargetId}
             resetSignal={resetSignal}
           />
-          {layers.prospectivity && <MapLegend theme={theme} showConfidence={layers.confidence} />}
         </div>
 
         <aside className="w-[300px] shrink-0 border-l border-border bg-bg-surface overflow-y-auto scrollbar-thin">
@@ -106,15 +111,30 @@ export default function ExplorePage() {
       </div>
 
       <div className="h-56 shrink-0 border-t border-border bg-bg-surface overflow-y-auto scrollbar-thin">
-        <div className="px-4 pt-2.5 pb-1 text-[11px] font-medium uppercase tracking-wide text-text-muted sticky top-0 bg-bg-surface">
-          Ranked targets
+        <div className="flex items-center gap-2 px-4 pt-2.5 pb-1 sticky top-0 bg-bg-surface">
+          <span className="text-[11px] font-medium uppercase tracking-wide text-text-muted">
+            Ranked targets
+          </span>
+          <span className="text-[11px] text-text-muted font-mono">{targets.length} ranked</span>
         </div>
         <RankedTargetsTable
           targets={targets}
           selectedTargetId={selectedTargetId}
           onSelectTarget={setSelectedTargetId}
+          hoveredTargetId={hoveredTargetId}
+          onHoverTarget={setHoveredTargetId}
         />
       </div>
+
+      <MapStatusBar
+        left={
+          selectedTarget
+            ? `Selected ${selectedTarget.id} · click a target for its reasoning chain`
+            : "Click a target on the map or table for its reasoning chain"
+        }
+        targetCount={targets.length}
+        modelVersion={targets[0]?.modelVersion ?? "—"}
+      />
     </div>
   );
 }

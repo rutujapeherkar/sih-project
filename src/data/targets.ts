@@ -21,6 +21,7 @@ export const targets: Target[] = [
       { label: "Structural proximity", direction: "positive", strength: 0.71 },
       { label: "Surface signature", direction: "positive", strength: 0.63 },
       { label: "Magnetic anomaly gradient", direction: "positive", strength: 0.48 },
+      { label: "Historic assay density", direction: "neutral", strength: 0.2 },
     ],
     nearestDrillholeId: "BH-017",
     nearestDrillholeDistanceM: 180,

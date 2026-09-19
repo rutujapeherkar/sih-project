@@ -1,10 +1,10 @@
 "use client";
 
 import { Target, Drillhole } from "@/types";
-import { ConfidenceDot } from "@/components/ui/ConfidenceDot";
+import { ConfidenceMatchCard } from "@/components/ui/ConfidenceMatchCard";
+import { EvidenceList } from "@/components/map/EvidenceList";
 import { Button } from "@/components/ui/Button";
 import { CloseIcon } from "@/components/icons";
-import { cn } from "@/lib/utils";
 
 interface TargetPanelProps {
   target: Target | null;
@@ -26,10 +26,7 @@ export function TargetPanel({ target, drillhole, onClose }: TargetPanelProps) {
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-start justify-between px-4 pt-3.5 pb-3 border-b border-border">
-        <div>
-          <div className="text-[15px] font-semibold text-text-primary font-mono">{target.id}</div>
-          <ConfidenceDot confidence={target.confidence} className="mt-1" />
-        </div>
+        <div className="text-[15px] font-semibold text-text-primary font-mono">{target.id}</div>
         <button
           type="button"
           onClick={onClose}
@@ -41,49 +38,33 @@ export function TargetPanel({ target, drillhole, onClose }: TargetPanelProps) {
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-3.5 space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <div className="text-[11px] text-text-secondary">Prospectivity</div>
-            <div className="text-xl font-semibold tabular-nums mt-0.5">{target.prospectivity.toFixed(2)}</div>
+        <div>
+          <div className="flex items-center justify-between text-[11px] text-text-secondary mb-1">
+            <span>Prospectivity</span>
+            <span className="text-lg font-semibold tabular-nums text-text-primary leading-none">
+              {target.prospectivity.toFixed(2)}
+            </span>
           </div>
+          <div className="h-2 rounded-full bg-bg-subtle overflow-hidden">
+            <div
+              className="h-full rounded-full bg-prospect-high"
+              style={{ width: `${target.prospectivity * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <ConfidenceMatchCard confidence={target.confidence} />
+
+        <EvidenceList evidence={target.evidence} />
+
+        <div className="grid grid-cols-2 gap-3 pt-1">
           <div>
             <div className="text-[11px] text-text-secondary">Area</div>
-            <div className="text-xl font-semibold tabular-nums mt-0.5 font-mono">{target.areaKm2.toFixed(2)} km²</div>
+            <div className="text-[13px] font-medium tabular-nums font-mono mt-0.5">{target.areaKm2.toFixed(2)} km²</div>
           </div>
-        </div>
-
-        <div>
-          <div className="text-[11px] text-text-secondary mb-1.5">Geological unit</div>
-          <div className="text-[13px] text-text-primary">{target.geologicalUnit}</div>
-        </div>
-
-        <div>
-          <div className="text-[11px] font-medium text-text-secondary mb-2">Evidence</div>
-          <div className="space-y-2">
-            {target.evidence.map((signal) => (
-              <div key={signal.label}>
-                <div className="flex items-center justify-between text-[12px] mb-0.5">
-                  <span className="text-text-primary">{signal.label}</span>
-                  <span
-                    className={cn(
-                      "font-mono text-[11px]",
-                      signal.direction === "positive" ? "text-success" : "text-danger",
-                    )}
-                  >
-                    {signal.direction === "positive" ? "+" : "−"}
-                  </span>
-                </div>
-                <div className="h-1.5 rounded-full bg-bg-subtle overflow-hidden">
-                  <div
-                    className={cn(
-                      "h-full rounded-full",
-                      signal.direction === "positive" ? "bg-brand" : "bg-danger",
-                    )}
-                    style={{ width: `${Math.round(signal.strength * 100)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+          <div>
+            <div className="text-[11px] text-text-secondary">Rock unit</div>
+            <div className="text-[13px] font-medium mt-0.5">{target.geologicalUnit}</div>
           </div>
         </div>
 

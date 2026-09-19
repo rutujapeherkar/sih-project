@@ -12,7 +12,7 @@ export interface Mine {
 
 export interface EvidenceSignal {
   label: string;
-  direction: "positive" | "negative";
+  direction: "positive" | "negative" | "neutral";
   strength: number;
 }
 
